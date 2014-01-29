@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="public" author="true" classpath="../CustomEvents/target/test-classes;../CustomEvents/target/classes;C:\Users\Nick\.m2\repository\org\jdom\jdom\2.0.0\jdom-2.0.0.jar;target/test-classes" destdir="doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="net.njay.serverinterconnect.temp,net.njay.serverinterconnect.event,net.njay.serverinterconnect.server,net.njay.serverinterconnect.client,net.njay.serverinterconnect.packet,net.njay.serverinterconnect.encoder,net.njay.serverinterconnect" source="1.5" sourcepath="src/test/resources;src/test/java;src/main/java;src/main/resources" splitindex="true" use="true" version="true"/>
+    </target>
+</project>

@@ -8,3 +8,4 @@
 /.idea
 /forge-download
 *-private.sh
+javadoc.xml

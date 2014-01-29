@@ -1,0 +1,11 @@
+<config proto="0.0.1">
+	<Mode> SERVER </Mode>
+	<SecretKey> KEYKEY123 </SecretKey>
+	<IV> 12345678 </IV>
+	<packets>
+		<packet id="1" path="net.njay.serverinterconnect.packet.TestPacket" />
+	</packets>
+	<server>
+		<port> 2442 </port>
+	</server>
+</config>

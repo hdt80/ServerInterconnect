@@ -3,8 +3,9 @@
 	<SecretKey> KEYKEY123 </SecretKey>
 	<IV> 12345678 </IV>
 	<packets>
-		<packet id="1" path="net.njay.serverinterconnect.packet.TestPacket" />
+		<packet id="1" path="net.njay.serverinterconnect.packet.packets.TestPacket" />
 	</packets>
+	<id> SERVER01 </id>
 	<server>
 		<port> 2442 </port>
 	</server>

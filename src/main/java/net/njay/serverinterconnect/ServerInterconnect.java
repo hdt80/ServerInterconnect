@@ -3,7 +3,7 @@ package net.njay.serverinterconnect;
 import java.io.File;
 import net.njay.serverinterconnect.client.Client;
 import net.njay.serverinterconnect.server.Server;
-import net.njay.serverinterconnect.temp.XMLBridge;
+import net.njay.serverinterconnect.xml.XMLBridge;
 
 public class ServerInterconnect {
 

@@ -7,15 +7,14 @@ import java.io.IOException;
 import java.net.Socket;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
 
 import net.njay.serverinterconnect.ServerInterconnect;
-import net.njay.serverinterconnect.event.PacketRecievedEvent;
 import net.njay.serverinterconnect.packet.Packet;
-import net.njay.serverinterconnect.packet.PacketType;
+import net.njay.serverinterconnect.packet.PacketHeader;
+import net.njay.serverinterconnect.packet.PacketStream;
 
 
 public class ServerThread extends Thread {
@@ -32,23 +31,13 @@ public class ServerThread extends Thread {
     }
 
     public boolean listen() throws IOException, ClassNotFoundException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException{
-    	String protocol = in.readUTF();
-		if (!ServerInterconnect.getXMLBridge().getProtocol().equals(protocol))
-			throw new RuntimeException("Protocols do not match!");
-		int packetID = in.readInt();
-		String packetSerialized = in.readUTF(); 
-		Packet p = Packet.deserialize(packetSerialized);
-		if (packetID != p.getId())
-			throw new RuntimeException("Packet ID mismatch!");
-		if (!PacketType.isValid(p.getId(), p.getClass().getName()))
-			throw new RuntimeException("Packet ID not recognized!");
-		System.out.println("Packet recieved!");
-		PacketRecievedEvent.call(p);
+    	PacketStream.read(in, true);
 		return true;
 	}
     
     public void send(Packet p) throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, ShortBufferException, BadPaddingException{
-    	p.send(out);
+    	PacketStream.write(out, new PacketHeader(ServerInterconnect.getXMLBridge().getProtocol(),
+				ServerInterconnect.getXMLBridge().getID(), p.getId()), p);
     }
 
     public void run() {

@@ -5,7 +5,10 @@
 	<packets>
 		<packet id="1" path="net.njay.serverinterconnect.packet.packets.TestPacket" />
 	</packets>
-	<id> SERVER01 </id>
+	<auth>
+		<username> SERVER01 </username>
+		<password> SamplePassword </password>
+	</auth>
 	<server>
 		<port> 2442 </port>
 	</server>

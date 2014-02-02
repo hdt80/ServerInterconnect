@@ -16,7 +16,6 @@ import net.njay.serverinterconnect.packet.Packet;
 import net.njay.serverinterconnect.packet.PacketHeader;
 import net.njay.serverinterconnect.packet.PacketStream;
 
-
 public class ServerThread extends Thread {
     public Socket socket = null;
     public DataOutputStream out = null;
@@ -37,9 +36,10 @@ public class ServerThread extends Thread {
     
     public void send(Packet p) throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, ShortBufferException, BadPaddingException{
     	PacketStream.write(out, new PacketHeader(ServerInterconnect.getXMLBridge().getProtocol(),
-				ServerInterconnect.getXMLBridge().getID(), p.getId()), p);
+				ServerInterconnect.getXMLBridge().getID(), p.getPacketId()), p);
     }
-
+    
+    @Override
     public void run() {
         try {
             out = new DataOutputStream(socket.getOutputStream());
@@ -59,8 +59,6 @@ public class ServerThread extends Thread {
                 if (in != null)
                     in.close();
                 socket.close();
-
-                Server.threads.remove(this);
             } catch (IOException e) {
             }
         }

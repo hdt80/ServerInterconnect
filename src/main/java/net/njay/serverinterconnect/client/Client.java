@@ -24,7 +24,7 @@ public class Client {
 	InvalidAlgorithmParameterException, IllegalBlockSizeException, 
 	ShortBufferException, BadPaddingException{
 		PacketStream.write(thread.getOutputStream(), new PacketHeader(ServerInterconnect.getXMLBridge().getProtocol(),
-				ServerInterconnect.getXMLBridge().getID(), p.getId()), p);
+				ServerInterconnect.getXMLBridge().getID(), p.getPacketId()), p);
 	}
 	
 	public static ClientThread getThread(){

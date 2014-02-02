@@ -18,9 +18,9 @@ public class PacketStream {
 			throw new RuntimeException("Protocols do not match!");
 
 		Packet p = Packet.deserialize(in.readUTF());
-		if (header.getPacketID() != p.getId())
+		if (header.getPacketID() != p.getPacketId())
 			throw new RuntimeException("Packet ID mismatch!");
-		if (!PacketType.isValid(p.getId(), p.getClass().getName()))
+		if (!PacketType.isValid(p.getPacketId(), p.getClass().getName()))
 			throw new RuntimeException("Packet ID not recognized!");
 
 		if (callEvent)

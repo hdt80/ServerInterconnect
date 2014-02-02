@@ -10,9 +10,9 @@ public class ListenerThread extends Thread{
 		try {
             while (true) {
                 Socket sock = Server.serverSocket.accept();
-                ServerThread t = new ServerThread(sock);
+                EvaluationThread t = new EvaluationThread(sock);
                 t.start();
-                Server.threads.add(t);
+                //Server.threads.add(t);
                 System.out.println(sock.getInetAddress()+" has joined.");
             }
         } catch (IOException e) {

@@ -12,9 +12,19 @@ import java.security.InvalidKeyException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 
+import net.njay.customevents.event.Event;
+import net.njay.customevents.event.EventHandler;
+import net.njay.customevents.event.Listener;
+import net.njay.serverinterconnect.ServerInterconnect;
+import net.njay.serverinterconnect.event.PacketRecievedEvent;
+import net.njay.serverinterconnect.packet.Packet;
+import net.njay.serverinterconnect.packet.PacketHeader;
 import net.njay.serverinterconnect.packet.PacketStream;
+import net.njay.serverinterconnect.packet.packets.AuthenticationPacket;
+import net.njay.serverinterconnect.packet.packets.RequestAuthenticationPacket;
+import net.njay.serverinterconnect.xml.XMLBridge;
 
-public class ClientThread extends Thread{
+public class ClientThread extends Thread implements Listener{
 
 	public Socket socket = null;
     public DataOutputStream out = null;
@@ -26,6 +36,7 @@ public class ClientThread extends Thread{
     public ClientThread(String serverAddress, int port){
     	this.serverAddress = serverAddress;
     	this.port = port;
+    	Event.addListener(this);
     	start();
     }
     
@@ -100,6 +111,15 @@ public class ClientThread extends Thread{
 	
 	public DataInputStream getInputStream(){
 		return this.in;
+	}
+	
+	@EventHandler //TODO: POSSIBLE VULNERABILITY, CLIENTS CAN BE TRICKED INTO SENDING CREDENTIALS
+	public void onPacketRecieve(PacketRecievedEvent e) throws IllegalBlockSizeException, IOException{
+		if (!(e.getPacket() instanceof RequestAuthenticationPacket)) return;
+		XMLBridge xml = ServerInterconnect.getXMLBridge();
+		Packet p = new AuthenticationPacket(xml.getID(), xml.getPassword());
+		PacketStream.write(out, new PacketHeader(xml.getProtocol(), xml.getID(), p.getPacketId()), p);
+		//Event.removeListener(this);
 	}
 
 }

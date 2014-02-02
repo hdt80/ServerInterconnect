@@ -44,7 +44,7 @@ public class XMLBridge {
 	}
 	
 	public String getID(){
-		return rootElement.getChild("id").getTextNormalize();
+		return rootElement.getChild("auth").getChild("username").getTextNormalize();
 	}
 	
 	public String getHostName(){
@@ -55,6 +55,10 @@ public class XMLBridge {
 		for (Element element : rootElement.getChild("packets").getChildren())
 			PacketType.register(Integer.valueOf(element.getAttributeValue("id")), 
 					element.getAttributeValue("path"));
+	}
+	
+	public String getPassword(){
+		return rootElement.getChild("auth").getChild("password").getTextNormalize();
 	}
 	
 	public Mode getMode(){

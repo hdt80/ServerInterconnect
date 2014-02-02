@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SealedObject;
@@ -16,7 +18,28 @@ public abstract class Packet implements Serializable{
 
 	private static final long serialVersionUID = 8603315557752257705L;
 	
-	public abstract int getId();
+	protected int packetId;
+	protected String senderId;
+	protected String originAddress;
+	protected ArrayList<String> recipientList = null;
+	
+	public Packet(int packetID, String senderId){
+		this.packetId = packetID;
+		this.senderId = senderId;
+	}
+	
+	public Packet(int packetID, String senderId, ArrayList<String> recipients){
+		this.packetId = packetID;
+		this.senderId = senderId;
+		this.recipientList = recipients;
+	}
+	
+	public int getPacketId(){ return this.packetId; }
+	public String getSenderId(){ return this.senderId; }
+	public ArrayList<String> getRecipients(){ return this.recipientList; }
+	public void setRecipients(ArrayList<String> recipients){ this.recipientList = recipients; }
+	public void setOriginAddress(String address){ this.originAddress = address; }
+	public String getOriginAddress(){ return this.originAddress; }
 	
 	public String serialize() throws IOException, IllegalBlockSizeException {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();

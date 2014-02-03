@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -30,14 +32,25 @@ public class ClientThread extends Thread implements Listener{
     public DataOutputStream out = null;
     public DataInputStream in = null;
     
+    private Queue<Packet> packetQueue = new LinkedList<Packet>();
+    private State currentState;
     private String serverAddress;
     private int port;
 	
     public ClientThread(String serverAddress, int port){
+    	setState(State.NOT_CONNECTED);
     	this.serverAddress = serverAddress;
     	this.port = port;
     	Event.addListener(this);
     	start();
+    }
+    
+    public void sendPacket(Packet packet) throws IllegalBlockSizeException, IOException{
+    	if (currentState != State.CONNECTED)
+    		packetQueue.add(packet);
+    	else
+    		PacketStream.write(getOutputStream(), new PacketHeader(ServerInterconnect.getXMLBridge().getProtocol(),
+    				ServerInterconnect.getXMLBridge().getID(), packet.getPacketId()), packet);
     }
     
 	@Override
@@ -53,6 +66,7 @@ public class ClientThread extends Thread implements Listener{
 			e.printStackTrace();
 			return;
 		}
+		setState(State.WAITING_AUTH);
 		System.out.println("Connected to " + socket.getInetAddress() + " successfully!");
 		try {
 			while(listen());
@@ -119,7 +133,24 @@ public class ClientThread extends Thread implements Listener{
 		XMLBridge xml = ServerInterconnect.getXMLBridge();
 		Packet p = new AuthenticationPacket(xml.getID(), xml.getPassword());
 		PacketStream.write(out, new PacketHeader(xml.getProtocol(), xml.getID(), p.getPacketId()), p);
-		//Event.removeListener(this);
+		setState(State.CONNECTED);
+		Event.removeListener(this);
+	}
+	
+	private void setState(State state){
+		this.currentState = state;
+		if (state == State.CONNECTED)
+			try {
+				flushQueue();
+			} catch (Exception e) {e.printStackTrace();}
+	}
+	
+	private void flushQueue() throws IllegalBlockSizeException, IOException{
+		while (!packetQueue.isEmpty())
+			sendPacket(packetQueue.poll());
 	}
 
+	public enum State{
+		NOT_CONNECTED, WAITING_AUTH, CONNECTED;
+	}
 }

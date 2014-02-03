@@ -23,8 +23,7 @@ public class Client {
 	public static void send(Packet p) throws IOException, InvalidKeyException, 
 	InvalidAlgorithmParameterException, IllegalBlockSizeException, 
 	ShortBufferException, BadPaddingException{
-		PacketStream.write(thread.getOutputStream(), new PacketHeader(ServerInterconnect.getXMLBridge().getProtocol(),
-				ServerInterconnect.getXMLBridge().getID(), p.getPacketId()), p);
+		getThread().sendPacket(p);
 	}
 	
 	public static ClientThread getThread(){

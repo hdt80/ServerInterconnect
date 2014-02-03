@@ -30,7 +30,7 @@ public class Sample implements Listener{
 		Thread t = new Thread(new Runnable(){
 			public void run(){
 				try {
-					Thread.sleep(2000);
+					//Thread.sleep(2000);
 					TestPacket packet = new TestPacket(ServerInterconnect.getXMLBridge().getID());
 					ArrayList<String> list = new ArrayList<String>();
 					list.add("CLIENT01");

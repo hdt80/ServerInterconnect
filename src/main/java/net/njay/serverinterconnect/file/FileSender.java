@@ -1,9 +1,11 @@
 package net.njay.serverinterconnect.file;
 
-import net.njay.serverinterconnect.log.Log;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import net.njay.serverinterconnect.packet.PacketStream;
 import net.njay.serverinterconnect.packet.packets.file.FileFragmentPacket;
-
 
 public class FileSender {
 
@@ -13,6 +15,13 @@ public class FileSender {
 	public FileSender(FileHeader header, byte... content){
 		this.header = header;
 		this.content = content;
+	}
+	
+	public FileSender(File file) throws IOException{
+		this.header = FileHeader.toHeader(file, 1500);
+		FileInputStream fis = new FileInputStream(file);
+		this.content = new byte[(int) file.length()]; fis.read(this.content);
+		fis.close();
 	}
 	
 	public void begin(long rate){
@@ -32,7 +41,6 @@ public class FileSender {
 			byte[] piece = new byte[header.getPacketSize() > content.length ? content.length : header.getPacketSize()];
 			for (int j = 0; currentContentIndex < content.length && j < header.getPacketSize(); currentContentIndex++, j++)
 				piece[j] = content[currentContentIndex];			
-			Log.debug(currentContentIndex + "  " + content.length);
 			PacketStream.safeWrite(new FileFragmentPacket(currentPacketId++, header, piece));
 			delay();
 			if (!check()) run();

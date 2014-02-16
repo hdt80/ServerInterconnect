@@ -14,7 +14,8 @@ import net.njay.customevents.event.Event;
 import net.njay.customevents.event.EventHandler;
 import net.njay.customevents.event.Listener;
 import net.njay.serverinterconnect.event.PacketRecievedEvent;
-import net.njay.serverinterconnect.packet.Packet;
+import net.njay.serverinterconnect.log.Log;
+import net.njay.serverinterconnect.packet.SerializablePacket;
 
 public class Server implements Listener{
     public static ArrayList<ClientConnection> activeConnections;
@@ -34,15 +35,18 @@ public class Server implements Listener{
         new ListenerThread().start();
     }
 
-    public static void relay(Packet packet) throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, ShortBufferException, BadPaddingException {
+    public static void relay(SerializablePacket packet) throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, ShortBufferException, BadPaddingException {
     	if (packet.getRecipients() == null)  
     		for (ClientConnection thread : activeConnections){
+    			 Log.debug("Relaying " + packet.getClass().getCanonicalName() + " to " + thread.getThread().getActiveSocket().getInetAddress().toString());
 	        	 thread.getThread().send(packet);
 	        }
     	else
     		for (ClientConnection thread : activeConnections){
-    			if (packet.getRecipients().contains(thread.getId()))
+    			if (packet.getRecipients().contains(thread.getId())){
+       			 	Log.debug("Relaying " + packet.getClass().getCanonicalName() + " to " + thread.getThread().getActiveSocket().getInetAddress().toString());
     				thread.getThread().send(packet);
+    			}
 	        }
     }
 

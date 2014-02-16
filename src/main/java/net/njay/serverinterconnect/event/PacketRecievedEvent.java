@@ -1,25 +1,18 @@
 package net.njay.serverinterconnect.event;
 
 import net.njay.customevents.event.Event;
-import net.njay.customevents.event.EventCaller;
-import net.njay.serverinterconnect.packet.Packet;
+import net.njay.serverinterconnect.packet.SerializablePacket;
 
 public class PacketRecievedEvent extends Event{
 
-	private Packet packet;
+	private SerializablePacket packet;
 	
-	public PacketRecievedEvent(Packet packet){
+	public PacketRecievedEvent(SerializablePacket packet){
 		this.packet = packet;
 	}
 	
-	public Packet getPacket(){
+	public SerializablePacket getPacket(){
 		return this.packet;
-	}
-	
-	public static void call(Packet p){
-		PacketRecievedEvent e = new PacketRecievedEvent(p);
-		EventCaller<PacketRecievedEvent> caller = new EventCaller<PacketRecievedEvent>();
-		caller.call(Event.getListeners(), e);
 	}
 
 }

@@ -7,10 +7,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
 
-import net.njay.serverinterconnect.ServerInterconnect;
-import net.njay.serverinterconnect.packet.Packet;
-import net.njay.serverinterconnect.packet.PacketHeader;
-import net.njay.serverinterconnect.packet.PacketStream;
+import net.njay.serverinterconnect.packet.SerializablePacket;
 
 public class Client {
 
@@ -20,7 +17,7 @@ public class Client {
         thread = new ClientThread(hostName, port);
     }
 	
-	public static void send(Packet p) throws IOException, InvalidKeyException, 
+	public static void send(SerializablePacket p) throws IOException, InvalidKeyException, 
 	InvalidAlgorithmParameterException, IllegalBlockSizeException, 
 	ShortBufferException, BadPaddingException{
 		getThread().sendPacket(p);

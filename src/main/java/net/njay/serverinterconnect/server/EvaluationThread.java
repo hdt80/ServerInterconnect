@@ -8,11 +8,13 @@ import java.net.Socket;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import net.njay.serverinterconnect.ServerInterconnect;
-import net.njay.serverinterconnect.packet.Packet;
+import net.njay.serverinterconnect.log.Log;
+import net.njay.serverinterconnect.packet.PacketStream;
+import net.njay.serverinterconnect.packet.SerializablePacket;
 import net.njay.serverinterconnect.packet.PacketHeader;
 import net.njay.serverinterconnect.packet.PacketType;
-import net.njay.serverinterconnect.packet.packets.AuthenticationPacket;
-import net.njay.serverinterconnect.packet.packets.RequestAuthenticationPacket;
+import net.njay.serverinterconnect.packet.packets.auth.AuthenticationPacket;
+import net.njay.serverinterconnect.packet.packets.auth.RequestAuthenticationPacket;
 
 public class EvaluationThread extends ServerThread{
 
@@ -25,7 +27,7 @@ public class EvaluationThread extends ServerThread{
         try {
             out = new DataOutputStream(socket.getOutputStream());
             in = new DataInputStream(socket.getInputStream());
-            send(new RequestAuthenticationPacket(ServerInterconnect.getXMLBridge().getID()));
+            PacketStream.writeOut(out, new RequestAuthenticationPacket());
             read();
         } catch (EOFException e) {
         	System.out.println("Possible malformed packet from: " + socket.getRemoteSocketAddress());
@@ -50,7 +52,7 @@ public class EvaluationThread extends ServerThread{
 		if (!ServerInterconnect.getXMLBridge().getProtocol().equals(header.getProtocol()))
 			throw new RuntimeException("Protocols do not match!");
 
-		Packet p = Packet.deserialize(in.readUTF());
+		SerializablePacket p = SerializablePacket.deserialize(in.readUTF());
 		if (header.getPacketID() != p.getPacketId())
 			throw new RuntimeException("Packet ID mismatch!");
 		if (!PacketType.isValid(p.getPacketId(), p.getClass().getName()))
@@ -61,6 +63,7 @@ public class EvaluationThread extends ServerThread{
 		AuthenticationPacket auth = (AuthenticationPacket) p;
 		if (!(auth.authenticate()))
 			throw new RuntimeException("Failed to authenticate client!");
+		Log.debug("Connection validated!");
 		Server.activeConnections.add(new ClientConnection(new ServerThread(socket), auth.getUsername()));
 		stop();
 	}

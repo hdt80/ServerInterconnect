@@ -13,17 +13,18 @@ import java.util.Queue;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.ShortBufferException;
 
 import net.njay.customevents.event.Event;
 import net.njay.customevents.event.EventHandler;
 import net.njay.customevents.event.Listener;
 import net.njay.serverinterconnect.ServerInterconnect;
 import net.njay.serverinterconnect.event.PacketRecievedEvent;
-import net.njay.serverinterconnect.packet.Packet;
-import net.njay.serverinterconnect.packet.PacketHeader;
+import net.njay.serverinterconnect.log.Log;
 import net.njay.serverinterconnect.packet.PacketStream;
-import net.njay.serverinterconnect.packet.packets.AuthenticationPacket;
-import net.njay.serverinterconnect.packet.packets.RequestAuthenticationPacket;
+import net.njay.serverinterconnect.packet.SerializablePacket;
+import net.njay.serverinterconnect.packet.packets.auth.AuthenticationPacket;
+import net.njay.serverinterconnect.packet.packets.auth.RequestAuthenticationPacket;
 import net.njay.serverinterconnect.xml.XMLBridge;
 
 public class ClientThread extends Thread implements Listener{
@@ -32,7 +33,7 @@ public class ClientThread extends Thread implements Listener{
     public DataOutputStream out = null;
     public DataInputStream in = null;
     
-    private Queue<Packet> packetQueue = new LinkedList<Packet>();
+    private Queue<SerializablePacket> packetQueue = new LinkedList<SerializablePacket>();
     private State currentState;
     private String serverAddress;
     private int port;
@@ -45,12 +46,11 @@ public class ClientThread extends Thread implements Listener{
     	start();
     }
     
-    public void sendPacket(Packet packet) throws IllegalBlockSizeException, IOException{
+    public void sendPacket(SerializablePacket packet) throws IllegalBlockSizeException, IOException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, BadPaddingException{
     	if (currentState != State.CONNECTED)
     		packetQueue.add(packet);
     	else
-    		PacketStream.write(getOutputStream(), new PacketHeader(ServerInterconnect.getXMLBridge().getProtocol(),
-    				ServerInterconnect.getXMLBridge().getID(), packet.getPacketId()), packet);
+    		PacketStream.write(packet);
     }
     
 	@Override
@@ -107,16 +107,20 @@ public class ClientThread extends Thread implements Listener{
 	}
 	
 	public void cleanup() throws IOException{
+		Log.debug("Cleaning socket...");
 		in.close();
 		out.close();
 		socket.close();
+		Log.debug("Socket cleaned.");
 	}
 	
 	public void init() throws UnknownHostException, IOException{
+		Log.debug("Initialized Client Socket.");
 		socket = new Socket(InetAddress.getByName(serverAddress),
     			port);
 		out = new DataOutputStream(socket.getOutputStream());
         in = new DataInputStream(socket.getInputStream());
+        Log.debug("Client Initialized.");
 	}
 	
 	public DataOutputStream getOutputStream(){
@@ -128,11 +132,13 @@ public class ClientThread extends Thread implements Listener{
 	}
 	
 	@EventHandler //TODO: POSSIBLE VULNERABILITY, CLIENTS CAN BE TRICKED INTO SENDING CREDENTIALS
-	public void onPacketRecieve(PacketRecievedEvent e) throws IllegalBlockSizeException, IOException{
+	public void onPacketRecieve(PacketRecievedEvent e) throws IllegalBlockSizeException, IOException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, BadPaddingException{
+		Log.debug("Packet Recieved: " + e.getPacket().getPacketId());
 		if (!(e.getPacket() instanceof RequestAuthenticationPacket)) return;
+		if (currentState == State.CONNECTED) return;
 		XMLBridge xml = ServerInterconnect.getXMLBridge();
-		Packet p = new AuthenticationPacket(xml.getID(), xml.getPassword());
-		PacketStream.write(out, new PacketHeader(xml.getProtocol(), xml.getID(), p.getPacketId()), p);
+		SerializablePacket p = new AuthenticationPacket(xml.getID(), xml.getPassword());
+		PacketStream.write(p);
 		setState(State.CONNECTED);
 		Event.removeListener(this);
 	}
@@ -145,7 +151,7 @@ public class ClientThread extends Thread implements Listener{
 			} catch (Exception e) {e.printStackTrace();}
 	}
 	
-	private void flushQueue() throws IllegalBlockSizeException, IOException{
+	private void flushQueue() throws IllegalBlockSizeException, IOException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, BadPaddingException{
 		while (!packetQueue.isEmpty())
 			sendPacket(packetQueue.poll());
 	}

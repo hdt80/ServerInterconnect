@@ -11,9 +11,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
 
-import net.njay.serverinterconnect.ServerInterconnect;
-import net.njay.serverinterconnect.packet.Packet;
-import net.njay.serverinterconnect.packet.PacketHeader;
+import net.njay.serverinterconnect.packet.SerializablePacket;
 import net.njay.serverinterconnect.packet.PacketStream;
 
 public class ServerThread extends Thread {
@@ -34,9 +32,18 @@ public class ServerThread extends Thread {
 		return true;
 	}
     
-    public void send(Packet p) throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, ShortBufferException, BadPaddingException{
-    	PacketStream.write(out, new PacketHeader(ServerInterconnect.getXMLBridge().getProtocol(),
-				ServerInterconnect.getXMLBridge().getID(), p.getPacketId()), p);
+    public void send(SerializablePacket p) throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, ShortBufferException, BadPaddingException{
+    	PacketStream.write(p);
+    }
+    
+    public void close(){
+    	try {
+            if (out != null)
+                out.close();
+            if (in != null)
+                in.close();
+            socket.close();
+        } catch (IOException e) { System.out.println("Could not close socket!"); }
     }
     
     @Override
@@ -63,5 +70,7 @@ public class ServerThread extends Thread {
             }
         }
     }
+    
+    public Socket getActiveSocket(){ return this.socket; }
 
 }

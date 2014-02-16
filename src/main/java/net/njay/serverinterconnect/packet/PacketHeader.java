@@ -11,6 +11,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SealedObject;
 
+import net.njay.serverinterconnect.ServerInterconnect;
 import net.njay.serverinterconnect.encoder.Base64Coder;
 import net.njay.serverinterconnect.encoder.EncryptionUtil;
 
@@ -54,6 +55,11 @@ public class PacketHeader implements Serializable{
 		PacketHeader p = (PacketHeader) obj.getObject(EncryptionUtil.getDecryptionCipher());
 		in.close(); ois.close();
 		return p;
+	}
+	
+	public static PacketHeader toPacketHeader(SerializablePacket packet){
+		return new PacketHeader(ServerInterconnect.getXMLBridge().getProtocol(),
+				ServerInterconnect.getXMLBridge().getID(), packet.getPacketId());
 	}
 
 }

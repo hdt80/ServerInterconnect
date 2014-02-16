@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
 
 import net.njay.customevents.event.Event;
 import net.njay.customevents.event.EventHandler;
@@ -19,14 +23,17 @@ import net.njay.serverinterconnect.packet.SerializablePacket;
 
 public class Server implements Listener{
     public static ArrayList<ClientConnection> activeConnections;
-    public static ServerSocket serverSocket = null;
+    public static SSLServerSocket serverSocket = null;
 
     public static void start(int port) {
     	Event.addListener(new Server());
     	activeConnections = new ArrayList<ClientConnection>();
         System.out.println("Starting server...");
         try {
-        	serverSocket = new ServerSocket(port);
+        	SSLServerSocketFactory serverSocketFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+            serverSocket = (SSLServerSocket) serverSocketFactory.createServerSocket(port);
+            final String[] enabledCipherSuites = { "SSL_DH_anon_WITH_RC4_128_MD5" };
+            serverSocket.setEnabledCipherSuites(enabledCipherSuites);
         } catch (IOException e) {
             System.err.println("Could not listen on port " + port);
             System.exit(-1);

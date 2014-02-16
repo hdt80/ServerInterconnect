@@ -31,14 +31,6 @@ public class XMLBridge {
 		return rootElement.getAttributeValue("proto");
 	}
 	
-	public byte[] getKeyBytes(){
-		return rootElement.getChild("SecretKey").getTextNormalize().getBytes();
-	}
-	
-	public byte[] getIVBytes(){
-		return rootElement.getChild("IV").getTextNormalize().getBytes();
-	}
-	
 	public int getPort(){
 		return Integer.valueOf(rootElement.getChild("server").getChild("port").getTextNormalize());
 	}

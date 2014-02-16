@@ -14,7 +14,6 @@ import javax.crypto.SealedObject;
 
 import net.njay.serverinterconnect.api.packet.Packet;
 import net.njay.serverinterconnect.encoder.Base64Coder;
-import net.njay.serverinterconnect.encoder.EncryptionUtil;
 
 public abstract class SerializablePacket extends Packet implements Serializable{
 
@@ -40,7 +39,7 @@ public abstract class SerializablePacket extends Packet implements Serializable{
 	public String serialize() throws IOException, IllegalBlockSizeException {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(buffer);
-		oos.writeObject(new SealedObject(this, EncryptionUtil.getEncryptionCipher()));
+		oos.writeObject(this);
 		oos.flush(); oos.close();
 		return new String(Base64Coder.encode(buffer.toByteArray()));
 	}
@@ -48,8 +47,7 @@ public abstract class SerializablePacket extends Packet implements Serializable{
 	public static SerializablePacket deserialize(String serialized) throws ClassNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException {
 		ByteArrayInputStream in = new ByteArrayInputStream(Base64Coder.decode(serialized));
 		ObjectInputStream ois = new ObjectInputStream(in);
-		SealedObject obj = (SealedObject) ois.readObject();
-		SerializablePacket p = (SerializablePacket) obj.getObject(EncryptionUtil.getDecryptionCipher());
+		SerializablePacket p = (SerializablePacket) ois.readObject();
 		in.close(); ois.close();
 		return p;
 	}

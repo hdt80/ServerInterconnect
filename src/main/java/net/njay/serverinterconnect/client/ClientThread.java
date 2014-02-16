@@ -14,6 +14,8 @@ import java.util.Queue;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 import net.njay.customevents.event.Event;
 import net.njay.customevents.event.EventHandler;
@@ -29,7 +31,7 @@ import net.njay.serverinterconnect.xml.XMLBridge;
 
 public class ClientThread extends Thread implements Listener{
 
-	public Socket socket = null;
+	public SSLSocket socket = null;
     public DataOutputStream out = null;
     public DataInputStream in = null;
     
@@ -116,8 +118,11 @@ public class ClientThread extends Thread implements Listener{
 	
 	public void init() throws UnknownHostException, IOException{
 		Log.debug("Initialized Client Socket.");
-		socket = new Socket(InetAddress.getByName(serverAddress),
-    			port);
+		SSLSocketFactory sslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+		socket = (SSLSocket) sslSocketFactory.createSocket(InetAddress.getByName(serverAddress), port);
+		final String[] enabledCipherSuites = { "SSL_DH_anon_WITH_RC4_128_MD5" };
+		socket.setEnabledCipherSuites(enabledCipherSuites);
+		socket.startHandshake();
 		out = new DataOutputStream(socket.getOutputStream());
         in = new DataInputStream(socket.getInputStream());
         Log.debug("Client Initialized.");

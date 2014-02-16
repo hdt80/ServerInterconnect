@@ -13,7 +13,6 @@ import javax.crypto.SealedObject;
 
 import net.njay.serverinterconnect.ServerInterconnect;
 import net.njay.serverinterconnect.encoder.Base64Coder;
-import net.njay.serverinterconnect.encoder.EncryptionUtil;
 
 public class PacketHeader implements Serializable{
 	
@@ -43,7 +42,7 @@ public class PacketHeader implements Serializable{
 	public String serialize() throws IOException, IllegalBlockSizeException {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(buffer);
-		oos.writeObject(new SealedObject(this, EncryptionUtil.getEncryptionCipher()));
+		oos.writeObject(this);
 		oos.flush(); oos.close();
 		return new String(Base64Coder.encode(buffer.toByteArray()));
 	}
@@ -51,8 +50,7 @@ public class PacketHeader implements Serializable{
 	public static PacketHeader deserialize(String serialized) throws ClassNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException {
 		ByteArrayInputStream in = new ByteArrayInputStream(Base64Coder.decode(serialized));
 		ObjectInputStream ois = new ObjectInputStream(in);
-		SealedObject obj = (SealedObject) ois.readObject();
-		PacketHeader p = (PacketHeader) obj.getObject(EncryptionUtil.getDecryptionCipher());
+		PacketHeader p = (PacketHeader) ois.readObject();
 		in.close(); ois.close();
 		return p;
 	}

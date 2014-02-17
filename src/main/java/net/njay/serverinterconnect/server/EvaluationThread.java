@@ -49,7 +49,7 @@ public class EvaluationThread extends ServerThread{
 	@SuppressWarnings("deprecation")
 	private void read() throws ClassNotFoundException, IllegalBlockSizeException, BadPaddingException, IOException{
 		PacketHeader header = PacketHeader.deserialize(in.readUTF());
-		if (!ServerInterconnect.getXMLBridge().getProtocol().equals(header.getProtocol()))
+		if (!ServerInterconnect.getConfig().getProtocol().equals(header.getProtocol()))
 			throw new RuntimeException("Protocols do not match!");
 
 		SerializablePacket p = SerializablePacket.deserialize(in.readUTF());

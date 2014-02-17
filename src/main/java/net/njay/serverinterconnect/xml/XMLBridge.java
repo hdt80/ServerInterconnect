@@ -10,7 +10,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
-public class XMLBridge {
+public class XMLBridge extends ConnectionConfig{
 
 	private File xmlFile;
 	private Document document; 
@@ -35,12 +35,16 @@ public class XMLBridge {
 		return Integer.valueOf(rootElement.getChild("server").getChild("port").getTextNormalize());
 	}
 	
-	public String getID(){
+	public String getUsername(){
 		return rootElement.getChild("auth").getChild("username").getTextNormalize();
 	}
 	
 	public String getHostName(){
 		return rootElement.getChild("server").getChild("hostname").getTextNormalize();
+	}
+	
+	public String getServerPassword(){
+		return rootElement.getChild("server").getChild("password").getTextNormalize();
 	}
 	
 	public void registerPackets(){
@@ -56,21 +60,4 @@ public class XMLBridge {
 	public Mode getMode(){
 		return Mode.valueOf(rootElement.getChild("Mode").getTextNormalize().toUpperCase());
 	}
-	
-	public enum Mode{
-		SERVER, CLIENT;
-	}
 }
-
-
-
-/*
-<config proto="0.0.1">
-	<Mode> Server </Mode>
-	<SecretKey> KEYKEY123 </SecretKey>
-	<IV> 12345678 </IV>
-	<packets>
-		<packet id=1 path=path />
-	</packets>
-</config>
-*/

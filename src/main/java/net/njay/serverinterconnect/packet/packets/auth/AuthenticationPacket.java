@@ -22,7 +22,7 @@ public class AuthenticationPacket extends SerializablePacket{
 	}
 	
 	public boolean authenticate(){
-		return password.equals(ServerInterconnect.getXMLBridge().getPassword());
+		return password.equals(ServerInterconnect.getConfig().getPassword());
 	}
 	
 }

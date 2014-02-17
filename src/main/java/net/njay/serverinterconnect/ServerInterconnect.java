@@ -10,30 +10,32 @@ import net.njay.serverinterconnect.log.Log;
 import net.njay.serverinterconnect.packet.PacketType;
 import net.njay.serverinterconnect.server.Server;
 import net.njay.serverinterconnect.upnp.UPNP;
+import net.njay.serverinterconnect.xml.ConnectionConfig;
 import net.njay.serverinterconnect.xml.XMLBridge;
 
 public class ServerInterconnect {
 
-	private static XMLBridge xmlBridge;
+	private static ConnectionConfig config;
 	
-	public static void initialize(File xml){
+	public static void initialize(ConnectionConfig conf, boolean defaultConnect){
 		registerCorePackets();
 		Event.addListener(new FileReciever());
-		xmlBridge = new XMLBridge(xml);
+		config = conf;
 		try {
-			xmlBridge.init();
+			config.init();
 		} catch (Exception e) {
 			System.err.println("There was a problem with your xml file!");
 			e.printStackTrace(); System.exit(-1);
 		}
 		try {
-			if (UPNP.forward(xmlBridge.getPort(), xmlBridge.getPort()+1) != xmlBridge.getPort())
+			if (UPNP.forward(config.getPort(), config.getPort()+1) != config.getPort())
 				Log.log(Level.SEVERE, "Failed to portforward!");
 		} catch (Exception e1) { Log.log(e1); }
-		if (xmlBridge.getMode() == XMLBridge.Mode.CLIENT)
-			Client.connect(xmlBridge.getHostName(), xmlBridge.getPort());
+		if (!defaultConnect) return;
+		if (config.getMode() == XMLBridge.Mode.CLIENT)
+			Client.connect(config.getHostName(), config.getPort());
 		else
-			Server.start(xmlBridge.getPort());
+			Server.start(config.getPort());
 	}
 	
 	private static void registerCorePackets(){
@@ -42,7 +44,7 @@ public class ServerInterconnect {
 		PacketType.register(4, "net.njay.serverinterconnect.packet.packets.file.FileFragmentPacket");
 	}
 	
-	public static XMLBridge getXMLBridge(){
-		return xmlBridge;
+	public static ConnectionConfig getConfig(){
+		return config;
 	}
 }

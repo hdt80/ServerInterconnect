@@ -56,8 +56,8 @@ public class PacketHeader implements Serializable{
 	}
 	
 	public static PacketHeader toPacketHeader(SerializablePacket packet){
-		return new PacketHeader(ServerInterconnect.getXMLBridge().getProtocol(),
-				ServerInterconnect.getXMLBridge().getID(), packet.getPacketId());
+		return new PacketHeader(ServerInterconnect.getConfig().getProtocol(),
+				ServerInterconnect.getConfig().getUsername(), packet.getPacketId());
 	}
 
 }

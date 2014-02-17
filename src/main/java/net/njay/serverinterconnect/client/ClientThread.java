@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -27,6 +26,7 @@ import net.njay.serverinterconnect.packet.PacketStream;
 import net.njay.serverinterconnect.packet.SerializablePacket;
 import net.njay.serverinterconnect.packet.packets.auth.AuthenticationPacket;
 import net.njay.serverinterconnect.packet.packets.auth.RequestAuthenticationPacket;
+import net.njay.serverinterconnect.xml.ConnectionConfig;
 import net.njay.serverinterconnect.xml.XMLBridge;
 
 public class ClientThread extends Thread implements Listener{
@@ -141,8 +141,8 @@ public class ClientThread extends Thread implements Listener{
 		Log.debug("Packet Recieved: " + e.getPacket().getPacketId());
 		if (!(e.getPacket() instanceof RequestAuthenticationPacket)) return;
 		if (currentState == State.CONNECTED) return;
-		XMLBridge xml = ServerInterconnect.getXMLBridge();
-		SerializablePacket p = new AuthenticationPacket(xml.getID(), xml.getPassword());
+		ConnectionConfig config = ServerInterconnect.getConfig();
+		SerializablePacket p = new AuthenticationPacket(config.getUsername(), config.getPassword());
 		PacketStream.write(p);
 		setState(State.CONNECTED);
 		Event.removeListener(this);

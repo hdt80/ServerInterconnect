@@ -22,7 +22,7 @@ public class PacketStream {
 	
 	public static SerializablePacket read(DataInputStream in, boolean callEvent) throws ClassNotFoundException, IllegalBlockSizeException, BadPaddingException, IOException{		
 		PacketHeader header = PacketHeader.deserialize(in.readUTF());
-		if (!ServerInterconnect.getXMLBridge().getProtocol().equals(header.getProtocol()))
+		if (!ServerInterconnect.getConfig().getProtocol().equals(header.getProtocol()))
 			throw new RuntimeException("Protocols do not match!");
 
 		SerializablePacket p = SerializablePacket.deserialize(in.readUTF());
@@ -37,7 +37,7 @@ public class PacketStream {
 	}
 	
 	public static void write(SerializablePacket p) throws IllegalBlockSizeException, IOException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, BadPaddingException{
-		if (ServerInterconnect.getXMLBridge().getMode() == XMLBridge.Mode.CLIENT){
+		if (ServerInterconnect.getConfig().getMode() == XMLBridge.Mode.CLIENT){
 			Log.debug("Sending Packet: " + p.getClass().getName());
 			DataOutputStream out = Client.getThread().getOutputStream();
 			out.writeUTF(PacketHeader.toPacketHeader(p).serialize());
@@ -49,7 +49,7 @@ public class PacketStream {
 	
 	public static void safeWrite(SerializablePacket p) {
 		try{
-			if (ServerInterconnect.getXMLBridge().getMode() == XMLBridge.Mode.CLIENT){
+			if (ServerInterconnect.getConfig().getMode() == XMLBridge.Mode.CLIENT){
 				Log.debug("Sending Packet: " + p.getClass().getName());
 				DataOutputStream out = Client.getThread().getOutputStream();
 				out.writeUTF(PacketHeader.toPacketHeader(p).serialize());

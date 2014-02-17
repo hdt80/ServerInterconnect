@@ -1,13 +1,11 @@
 package net.njay.serverinterconnect;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import net.njay.customevents.event.Event;
 import net.njay.customevents.event.EventHandler;
 import net.njay.customevents.event.Listener;
 import net.njay.serverinterconnect.event.PacketRecievedEvent;
-import net.njay.serverinterconnect.file.FileHeader;
 import net.njay.serverinterconnect.file.FileSender;
 import net.njay.serverinterconnect.log.Log;
 import net.njay.serverinterconnect.xml.XMLBridge;
@@ -20,9 +18,10 @@ public class Sample implements Listener{
 	
 	public static void main(String[] args) throws IOException, JDOMException {
 		Log.setDebugging(true);
-		Event.addListener(new Sample());	
-		ServerInterconnect.initialize(new File("config.xml"));
-		if (ServerInterconnect.getXMLBridge().getMode() == XMLBridge.Mode.CLIENT)
+		Event.addListener(new Sample());
+		XMLBridge xml = new XMLBridge(new File("config.xml"));
+		ServerInterconnect.initialize(xml, true);
+		if (ServerInterconnect.getConfig().getMode() == XMLBridge.Mode.CLIENT)
 			client();
 	}
 	
@@ -32,7 +31,7 @@ public class Sample implements Listener{
 			public void run(){
 				try {
 					Thread.sleep(2000);
-					FileSender sender = new FileSender(new File("test.txt"));
+					FileSender sender = new FileSender(new File("fly.jpg"));
 					sender.begin(20);
 				} catch (Exception e) {e.printStackTrace();}
 			}

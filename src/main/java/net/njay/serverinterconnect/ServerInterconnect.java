@@ -7,7 +7,6 @@ import net.njay.customevents.event.Event;
 import net.njay.serverinterconnect.client.Client;
 import net.njay.serverinterconnect.file.FileReciever;
 import net.njay.serverinterconnect.log.Log;
-import net.njay.serverinterconnect.packet.PacketType;
 import net.njay.serverinterconnect.server.Server;
 import net.njay.serverinterconnect.upnp.UPNP;
 import net.njay.serverinterconnect.xml.ConnectionConfig;
@@ -18,7 +17,6 @@ public class ServerInterconnect {
 	private static ConnectionConfig config;
 	
 	public static void initialize(ConnectionConfig conf, boolean defaultConnect){
-		registerCorePackets();
 		Event.addListener(new FileReciever());
 		config = conf;
 		try {
@@ -36,12 +34,6 @@ public class ServerInterconnect {
 			Client.connect(config.getHostName(), config.getPort());
 		else
 			Server.start(config.getPort());
-	}
-	
-	private static void registerCorePackets(){
-		PacketType.register(2, "net.njay.serverinterconnect.packet.packets.auth.RequestAuthenticationPacket");
-		PacketType.register(3, "net.njay.serverinterconnect.packet.packets.auth.AuthenticationPacket");
-		PacketType.register(4, "net.njay.serverinterconnect.packet.packets.file.FileFragmentPacket");
 	}
 	
 	public static ConnectionConfig getConfig(){

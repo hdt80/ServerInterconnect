@@ -13,7 +13,6 @@ public abstract class ConnectionConfig {
 	public abstract String getPassword();
 	public abstract String getHostName();
 	public abstract String getServerPassword();
-	public abstract void registerPackets();
 	public abstract Mode getMode();
 
 	

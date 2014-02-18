@@ -11,8 +11,6 @@ import net.njay.serverinterconnect.ServerInterconnect;
 import net.njay.serverinterconnect.log.Log;
 import net.njay.serverinterconnect.packet.PacketStream;
 import net.njay.serverinterconnect.packet.SerializablePacket;
-import net.njay.serverinterconnect.packet.PacketHeader;
-import net.njay.serverinterconnect.packet.PacketType;
 import net.njay.serverinterconnect.packet.packets.auth.AuthenticationPacket;
 import net.njay.serverinterconnect.packet.packets.auth.RequestAuthenticationPacket;
 
@@ -48,16 +46,7 @@ public class EvaluationThread extends ServerThread{
 	
 	@SuppressWarnings("deprecation")
 	private void read() throws ClassNotFoundException, IllegalBlockSizeException, BadPaddingException, IOException{
-		PacketHeader header = PacketHeader.deserialize(in.readUTF());
-		if (!ServerInterconnect.getConfig().getProtocol().equals(header.getProtocol()))
-			throw new RuntimeException("Protocols do not match!");
-
-		SerializablePacket p = SerializablePacket.deserialize(in.readUTF());
-		if (header.getPacketID() != p.getPacketId())
-			throw new RuntimeException("Packet ID mismatch!");
-		if (!PacketType.isValid(p.getPacketId(), p.getClass().getName()))
-			throw new RuntimeException("Packet ID not recognized!");
-		
+		SerializablePacket p = SerializablePacket.deserialize(in.readUTF());		
 		if (!(p instanceof AuthenticationPacket))
 			throw new RuntimeException("Client did not authenticate!");
 		AuthenticationPacket auth = (AuthenticationPacket) p;

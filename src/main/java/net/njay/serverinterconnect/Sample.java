@@ -31,7 +31,7 @@ public class Sample implements Listener{
 			public void run(){
 				try {
 					Thread.sleep(2000);
-					FileSender sender = new FileSender(new File("fly.jpg"));
+					FileSender sender = new FileSender(new File("test.txt"));
 					sender.begin(20);
 				} catch (Exception e) {e.printStackTrace();}
 			}
@@ -42,6 +42,6 @@ public class Sample implements Listener{
 	@EventHandler
 	public void test(PacketRecievedEvent e) throws Exception{
 		Log.debug("Packet Recieved:{ ClassType: " + e.getPacket().getClass().getName() + 
-				", ID: " + e.getPacket().getPacketId() + "}");
+				"}");
 	}
 }

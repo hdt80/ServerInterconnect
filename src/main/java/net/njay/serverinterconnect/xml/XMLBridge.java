@@ -3,8 +3,6 @@ package net.njay.serverinterconnect.xml;
 import java.io.File;
 import java.io.IOException;
 
-import net.njay.serverinterconnect.packet.PacketType;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -24,7 +22,6 @@ public class XMLBridge extends ConnectionConfig{
 		xmlFile.createNewFile();
 		document = (Document) new SAXBuilder().build(xmlFile);
 		rootElement = document.getRootElement();
-		registerPackets();
 	}
 	
 	public String getProtocol(){
@@ -45,12 +42,6 @@ public class XMLBridge extends ConnectionConfig{
 	
 	public String getServerPassword(){
 		return rootElement.getChild("server").getChild("password").getTextNormalize();
-	}
-	
-	public void registerPackets(){
-		for (Element element : rootElement.getChild("packets").getChildren())
-			PacketType.register(Integer.valueOf(element.getAttributeValue("id")), 
-					element.getAttributeValue("path"));
 	}
 	
 	public String getPassword(){
